@@ -16,19 +16,24 @@ public class Main {
         loadCategoriesFromFile(file);
         MaxCategoryCalculator maxCategoryCalculator = new MaxCategoryCalculator();
         ObjectMapper objectMapper = new ObjectMapper();
-        try (ServerSocket serverSocket = new ServerSocket(8989);) { // стартуем сервер один(!) раз
+        try (ServerSocket serverSocket = new ServerSocket(8989)) { // стартуем сервер один(!) раз
             while (true) { // в цикле(!) принимаем подключения
                 try (
                         Socket socket = serverSocket.accept();
-                        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 ) {
                     String line;
                     String requestString = "";
+                    Request request = null;
                     while ((line = in.readLine()) != null) {
                         requestString += line;
+                        try {
+                            request = objectMapper.readValue(requestString, Request.class);
+                            break;
+                        } catch (Exception e) {
+                        }
                     }
-                    Request request = objectMapper.readValue(requestString, Request.class);
                     maxCategoryCalculator.recalculateSums(request.getTitle(), request.getSum(), categoriesToSums, itemsToCategories);
                     MaxCategory maxCategory = maxCategoryCalculator.getMaxCategory(categoriesToSums);
                     Response response = new Response();

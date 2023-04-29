@@ -15,9 +15,13 @@ public class MaxCategoryCalculator {
     public void recalculateSums (String title, int sum, Map <String, Integer> categoriesToSums, Map <String, String> itemsToCategories) {
         String category = itemsToCategories.get(title);
         if (category == null) {
-            Integer currentSum = categoriesToSums.get("другое");
-            currentSum += sum;
-            categoriesToSums.put("другое", currentSum);
+            if (categoriesToSums.containsKey("другое")) {
+                Integer currentSum = categoriesToSums.get("другое");
+                currentSum += sum;
+                categoriesToSums.put("другое", currentSum);
+            } else {
+                categoriesToSums.put("другое", sum);
+            }
         } else {
             Integer currentSum = categoriesToSums.get(category);
             currentSum +=sum;
